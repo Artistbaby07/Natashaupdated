@@ -36,7 +36,7 @@
       },
       "CASH_API_KEY": {
          "description": "Required for currency converter. Get yours from https://www.alphavantage.co/support/#api-key",
-         "required": true,
+         "required": false,
          "value": ""
       },
       "DEL_CMDS": {
@@ -75,7 +75,7 @@
       },
       "TIME_API_KEY": {
          "description": "Required for timezone information. Get yours from https://timezonedb.com/api",
-         "required": true,
+         "required": false,
          "value": ""
       },
       "TOKEN": {
