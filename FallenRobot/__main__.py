@@ -7,14 +7,11 @@ from typing import Optional
 from FallenRobot import (
     ALLOW_EXCL,
     CERT_PATH,
-    DONATION_LINK,
     LOGGER,
     OWNER_ID,
     PORT,
     SUPPORT_CHAT,
     TOKEN,
-    URL,
-    WEBHOOK,
     SUPPORT_CHAT,
     dispatcher,
     StartTime,
@@ -669,39 +666,6 @@ def get_settings(update: Update, context: CallbackContext):
     else:
         send_settings(chat.id, user.id, True)
 
-@run_async
-def donate(update: Update, context: CallbackContext):
-    user = update.effective_message.from_user
-    chat = update.effective_chat  # type: Optional[Chat]
-    bot = context.bot
-    if chat.type == "private":
-        update.effective_message.reply_text(
-            DONATE_STRING, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
-        )
-
-        if OWNER_ID != 254318997 and DONATION_LINK:
-            update.effective_message.reply_text(
-                "You can also donate to the person currently running me "
-                "[here]({})".format(DONATION_LINK),
-                parse_mode=ParseMode.MARKDOWN,
-            )
-
-    else:
-        try:
-            bot.send_message(
-                user.id,
-                DONATE_STRING,
-                parse_mode=ParseMode.MARKDOWN,
-                disable_web_page_preview=True,
-            )
-
-            update.effective_message.reply_text(
-                "I've PM'ed you about donating to my creator!"
-            )
-        except Unauthorized:
-            update.effective_message.reply_text(
-                "Contact me in PM first to get donation information."
-            )
 
 
 def migrate_chats(update: Update, context: CallbackContext):
@@ -746,8 +710,7 @@ def main():
 
     about_callback_handler = CallbackQueryHandler(kazuko_about_callback, pattern=r"kazuko_", run_async=True)
     source_callback_handler = CallbackQueryHandler(Source_about_callback, pattern=r"source_, run_async=True")
-
-    donate_handler = CommandHandler("donate", donate, run_async=True)
+   
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
     # dispatcher.add_handler(test_handler)
@@ -759,22 +722,9 @@ def main():
     dispatcher.add_handler(help_callback_handler)
     dispatcher.add_handler(settings_callback_handler)
     dispatcher.add_handler(migrate_handler)
-    dispatcher.add_handler(donate_handler)
-
     dispatcher.add_error_handler(error_callback)
-
-    if WEBHOOK:
-        LOGGER.info("Using webhooks.")
-        updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-
-        if CERT_PATH:
-            updater.bot.set_webhook(url=URL + TOKEN, certificate=open(CERT_PATH, "rb"))
-        else:
-            updater.bot.set_webhook(url=URL + TOKEN)
-
-    else:
-        LOGGER.info("Using long polling.")
-        updater.start_polling(timeout=15, read_latency=4, clean=True)
+    LOGGER.info("Using long polling.")
+    updater.start_polling(timeout=15, read_latency=4, clean=True)
 
     if len(argv) not in (1, 3, 4):
         telethn.disconnect()
